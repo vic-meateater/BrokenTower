@@ -1,15 +1,12 @@
-using System.Collections.Generic;
-using Interfaces;
+using System;
+using BrokenTower.Interfaces;
 using UnityEngine;
 
 namespace BrokenTower
 {
     [RequireComponent(typeof(Rigidbody))]
-    public class Unit: IDestroyable
+    public abstract class Unit: MonoBehaviour, IDestroyable
     {
-        public void DisableKinematic(IEnumerable<Collider> colliders)
-        {
-            throw new System.NotImplementedException();
-        }
+        public abstract void DisableKinematic();
     }
 }

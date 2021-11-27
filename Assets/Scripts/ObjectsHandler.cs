@@ -1,5 +1,4 @@
-using System.Collections;
-using System.Collections.Generic;
+using BrokenTower.Interfaces;
 using UnityEngine;
 
 namespace BrokenTower
@@ -7,49 +6,40 @@ namespace BrokenTower
     public class ObjectsHandler : MonoBehaviour
     {
         private Camera _camera;
-        private const float EXPLOSION_RADIUS = 3f;
-        private const float EXPLOSION_FORCE = 500f;
+        private const float EXPLOSION_RADIUS = 2f;
+        private Unit _unit;
+        private ParticleSystem _particleSystem;
+        private ExplosionView _explosionView;
+        
     
         void Start()
         {
             _camera = Camera.main;
+            _particleSystem = FindObjectOfType<ParticleSystem>();
+            _explosionView = new ExplosionView(_particleSystem);
         }
-    
-        void Update()
+
+        private void Update()
         {
             if (Input.GetButtonDown("Fire1"))
             {
                 Shoot();
             }
         }
-    
-        private void DisableKinematic(IEnumerable<Collider> colliders)
-        {
-            foreach (var c in colliders)
-            {
-                if (c.TryGetComponent(out Rigidbody rb))
-                {
-                    rb.isKinematic = false; 
-                }
-            }
-        }
-    
+
+        
         private void Shoot()
         {
             var ray = _camera.ScreenPointToRay(Input.mousePosition);
             Physics.Raycast(ray, out var hitInfo);
-            Debug.Log(hitInfo.transform.name);
-    
+            _explosionView.Explosion(hitInfo.transform);
             var surroundingObjects = Physics.OverlapSphere(hitInfo.transform.position, EXPLOSION_RADIUS);
-            if (surroundingObjects != null)
+            if (surroundingObjects == null) return;
+            foreach (var o in surroundingObjects)
             {
-                DisableKinematic(surroundingObjects);
-            }
-            foreach (var surroundingObject in surroundingObjects)
-            {
-                if (surroundingObject.TryGetComponent(out Rigidbody rb))
+                if (o.TryGetComponent(out IDestroyable unit))
                 {
-                    rb.AddExplosionForce(EXPLOSION_FORCE, hitInfo.transform.position, EXPLOSION_RADIUS);
+                    unit.DisableKinematic();
                 }
             }
         }

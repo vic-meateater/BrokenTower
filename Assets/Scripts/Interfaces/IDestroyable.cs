@@ -1,10 +1,7 @@
-using System.Collections.Generic;
-using UnityEngine;
-
-namespace Interfaces
+namespace BrokenTower.Interfaces
 {
     public interface IDestroyable
-    {
-        public void DisableKinematic(IEnumerable<Collider> colliders);
+    { 
+        public void DisableKinematic();
     }
 }
